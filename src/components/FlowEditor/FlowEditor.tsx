@@ -19,6 +19,8 @@ import FlowNavbar from './FlowNavbar';
 import BoxNode from './nodes/BoxNode';
 import CircleNode from './nodes/CircleNode';
 import DiamondNode from './nodes/DiamondNode';
+import ConditionalNode from './nodes/ConditionalNode';
+import CustomEdge from './edges/CustomEdge';
 import { useToast } from '@/hooks/use-toast';
 
 const initialNodes: Node[] = [
@@ -75,6 +77,8 @@ const getLayoutedElements = (
 const FlowEditor = () => {
   const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
+  const [currentEdgeType, setCurrentEdgeType] = useState<'bezier' | 'step' | 'smoothstep' | 'straight'>('bezier');
+  const [edgeAnimated, setEdgeAnimated] = useState(false);
   const { toast } = useToast();
 
   const nodeTypes: NodeTypes = useMemo(
@@ -82,6 +86,14 @@ const FlowEditor = () => {
       box: BoxNode,
       circle: CircleNode,
       diamond: DiamondNode,
+      conditional: ConditionalNode,
+    }),
+    []
+  );
+
+  const edgeTypes = useMemo(
+    () => ({
+      custom: CustomEdge,
     }),
     []
   );
@@ -97,11 +109,21 @@ const FlowEditor = () => {
   );
 
   const onConnect: OnConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(connection, eds)),
-    []
+    (connection) => {
+      const newEdge = {
+        ...connection,
+        type: 'custom',
+        data: {
+          edgeType: currentEdgeType,
+          animated: edgeAnimated,
+        },
+      };
+      setEdges((eds) => addEdge(newEdge, eds));
+    },
+    [currentEdgeType, edgeAnimated]
   );
 
-  const handleAddNode = useCallback((nodeType: 'box' | 'circle' | 'diamond') => {
+  const handleAddNode = useCallback((nodeType: 'box' | 'circle' | 'diamond' | 'conditional') => {
     const id = `${nodeType}-${Date.now()}`;
     const newNode: Node = {
       id,
@@ -217,6 +239,10 @@ const FlowEditor = () => {
         onExport={handleExport}
         onAddNode={handleAddNode}
         onAutoLayout={handleAutoLayout}
+        currentEdgeType={currentEdgeType}
+        onEdgeTypeChange={setCurrentEdgeType}
+        edgeAnimated={edgeAnimated}
+        onEdgeAnimatedChange={setEdgeAnimated}
       />
       
       <div className="flex-1">
@@ -227,6 +253,7 @@ const FlowEditor = () => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           fitView
           className="bg-flow-bg"
         >

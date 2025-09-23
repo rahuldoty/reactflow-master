@@ -5,7 +5,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Save, FileUp, Download, Trash2, GitBranch, Plus, Layout } from "lucide-react";
+import {
+  Save,
+  FileUp,
+  Download,
+  Trash2,
+  GitBranch,
+  Plus,
+  Layout,
+  ChevronDown,
+  Square,
+  Circle,
+  Diamond,
+  Zap,
+  Sparkles,
+} from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 
 interface FlowNavbarProps {
@@ -13,11 +28,26 @@ interface FlowNavbarProps {
   onLoad: (file: File) => void;
   onClear: () => void;
   onExport: () => void;
-  onAddNode: (nodeType: 'box' | 'circle' | 'diamond') => void;
+  onAddNode: (nodeType: 'box' | 'circle' | 'diamond' | 'conditional') => void;
   onAutoLayout: (layoutType: 'horizontal' | 'vertical' | 'tree') => void;
+  currentEdgeType: 'bezier' | 'step' | 'smoothstep' | 'straight';
+  onEdgeTypeChange: (type: 'bezier' | 'step' | 'smoothstep' | 'straight') => void;
+  edgeAnimated: boolean;
+  onEdgeAnimatedChange: (animated: boolean) => void;
 }
 
-const FlowNavbar = ({ onSave, onLoad, onClear, onExport, onAddNode, onAutoLayout }: FlowNavbarProps) => {
+const FlowNavbar = ({
+  onSave,
+  onLoad,
+  onClear,
+  onExport,
+  onAddNode,
+  onAutoLayout,
+  currentEdgeType,
+  onEdgeTypeChange,
+  edgeAnimated,
+  onEdgeAnimatedChange,
+}: FlowNavbarProps) => {
   const { toast } = useToast();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,16 +83,20 @@ const FlowNavbar = ({ onSave, onLoad, onClear, onExport, onAddNode, onAutoLayout
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
             <DropdownMenuItem onClick={() => onAddNode('box')}>
-              <div className="w-4 h-4 border border-current mr-2" />
+              <Square className="w-4 h-4 mr-2" />
               Box Node
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onAddNode('circle')}>
-              <div className="w-4 h-4 rounded-full border border-current mr-2" />
+              <Circle className="w-4 h-4 mr-2" />
               Circle Node
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onAddNode('diamond')}>
-              <div className="w-4 h-4 transform rotate-45 border border-current mr-2" />
+              <Diamond className="w-4 h-4 mr-2" />
               Diamond Node
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onAddNode('conditional')}>
+              <GitBranch className="w-4 h-4 mr-2" />
+              If/Else Node
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -87,6 +121,64 @@ const FlowNavbar = ({ onSave, onLoad, onClear, onExport, onAddNode, onAutoLayout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Separator orientation="vertical" className="h-6 mx-2" />
+
+        {/* Edge Type Controls */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Zap className="w-4 h-4" />
+              Edge Type
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuItem onClick={() => onEdgeTypeChange('bezier')}>
+              <div className="flex items-center">
+                <div className="w-4 h-4 mr-2 flex items-center">
+                  {currentEdgeType === 'bezier' && <div className="w-2 h-2 bg-primary rounded-full" />}
+                </div>
+                Bezier (Curved)
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdgeTypeChange('straight')}>
+              <div className="flex items-center">
+                <div className="w-4 h-4 mr-2 flex items-center">
+                  {currentEdgeType === 'straight' && <div className="w-2 h-2 bg-primary rounded-full" />}
+                </div>
+                Straight
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdgeTypeChange('step')}>
+              <div className="flex items-center">
+                <div className="w-4 h-4 mr-2 flex items-center">
+                  {currentEdgeType === 'step' && <div className="w-2 h-2 bg-primary rounded-full" />}
+                </div>
+                Step
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdgeTypeChange('smoothstep')}>
+              <div className="flex items-center">
+                <div className="w-4 h-4 mr-2 flex items-center">
+                  {currentEdgeType === 'smoothstep' && <div className="w-2 h-2 bg-primary rounded-full" />}
+                </div>
+                Smooth Step
+              </div>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Edge Animation Toggle */}
+        <Button
+          variant={edgeAnimated ? "default" : "outline"}
+          size="sm"
+          onClick={() => onEdgeAnimatedChange(!edgeAnimated)}
+          className="gap-2"
+        >
+          <Sparkles className="w-4 h-4" />
+          {edgeAnimated ? 'Animated' : 'Static'}
+        </Button>
 
         <div className="w-px h-6 bg-border mx-2" />
 

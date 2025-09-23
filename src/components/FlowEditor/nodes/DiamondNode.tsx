@@ -49,22 +49,12 @@ const DiamondNode = ({ data, selected, id }: NodeProps<DiamondNodeData>) => {
       {/* Handles */}
       <Handle
         type="target"
-        position={Position.Top}
+        position={Position.Left}
         className="w-3 h-3 !bg-handle-bg border-2 border-white"
       />
       <Handle
         type="source"
         position={Position.Right}
-        className="w-3 h-3 !bg-handle-bg border-2 border-white"
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="w-3 h-3 !bg-handle-bg border-2 border-white"
-      />
-      <Handle
-        type="target"
-        position={Position.Left}
         className="w-3 h-3 !bg-handle-bg border-2 border-white"
       />
 
